@@ -12,9 +12,9 @@ ssh USERNAME@IP_ADDRESS
 
 ### 1. Create users
 
-* `bot`: for CI/CD automation
-* `prosper`: personal/admin user
-* Add more as needed
+- `bot`: for CI/CD automation
+- `prosper`: personal/admin user
+- Add more as needed
 
 ```bash
 adduser bot
@@ -49,13 +49,13 @@ sudo ufw status
 
 Generate SSH key (choose one):
 
-* Recommended: ED25519 (secure & modern)
+- Recommended: ED25519 (secure & modern)
 
 ```bash
 ssh-keygen -t ed25519 -a 100
 ```
 
-* Alternatively: RSA 4096 bits (for maximum compatibility)
+- Alternatively: RSA 4096 bits (for maximum compatibility)
 
 ```bash
 ssh-keygen -t rsa -b 4096
@@ -189,7 +189,7 @@ sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
 
 ## Additionals
 
-* Get node/cluster name:
+- Get node/cluster name:
 
 ```bash
 kubectl get nodes -o wide
@@ -197,9 +197,9 @@ kubectl get nodes -o wide
 
 Check the `NAME` column for your node name.
 
-* k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
+- k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
 
-* For monitoring (Prometheus/Grafana), use Helm charts.
+- For monitoring (Prometheus/Grafana), use Helm charts.
   Avoid installing heavy monitoring on the master node.
   Prefer separate clusters or nodes for observability.
 
@@ -208,5 +208,3 @@ Check the `NAME` column for your node name.
 ## ✅ Server is now ready for Kubernetes and secure operations.
 
 ---
-
-*End of setup guide.*
