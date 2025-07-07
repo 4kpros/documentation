@@ -73,7 +73,7 @@
    ssh USERNAME@IP_ADDRESS
    ```
 
-# Step 2: Install Packages, Kubernetes, SSH key for GitHub Actions
+# Step 2: Install Packages, Kubernetes, SSH key
 
 1. Update and install packages
 
@@ -83,7 +83,7 @@
    sudo apt install curl wget bash git make tmux vim -y
    ```
 
-2. Generate ssh keys(for every user including root)
+2. Generate ssh keys(for every user including root). You'll need to login with every user separately
 
    ```
    ssh-keygen -t rsa -b 4096
@@ -117,7 +117,6 @@
 
    - Restart the server
 
-
 # Step 3: Create devops group, ci(for automation) group and data folder
 
 1. Create devops group for server data access(the path /mnt/node/data/apps is called `NODE_APPS_DATA_PATH`). Add more users if needed (e.g. and for my personal usage: prosper as example)
@@ -141,3 +140,17 @@
    sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
    sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
    ```
+
+# Additionals
+
+1. Get the node/cluster name: login with user who have access to the server and have `k3s` group
+
+   ```
+   kubectl get nodes -o wide
+   ```
+
+   Check the column `NAME` to get the node name
+
+2. By default k3s comes with traefik, and it's highly recommended to use it for ingress controller since it's already configured for you
+
+3. If you want to use Prometheus or Grafana, we recommend to install the helm chart. And also install it on your master node(it will overload the server and it's not recommended. It's better to install it on a separate cluster/node, or on different server or mabe on your local machine). Check the k3s documentation for more details
