@@ -49,6 +49,8 @@ sudo ufw status
 
 Generate SSH key (choose one):
 
+(Ignore passphrase for `bot` if used in CI/CD)
+
 - Recommended: ED25519 (secure & modern)
 
 ```bash
@@ -67,8 +69,6 @@ Then copy the public key to your server:
 ssh-copy-id bot@IP_ADDRESS
 ssh-copy-id prosper@IP_ADDRESS
 ```
-
-(Remove passphrase for `bot` if used in CI/CD)
 
 **On the server:**
 
