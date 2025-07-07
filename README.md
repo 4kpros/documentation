@@ -62,11 +62,11 @@
 
    - Change these values(on /etc/ssh/sshd_config file) and save.
       ```
-      `PubkeyAuthentication yes`
+      PubkeyAuthentication yes
 
-      `PasswordAuthentication no`
+      PasswordAuthentication no
 
-      `PermitRootLogin no`
+      PermitRootLogin no
       ```
 
    - Restart SSH service
