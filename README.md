@@ -1,4 +1,4 @@
-# Step 1: Setup VPS, security and best practices
+# Step 1: Setup VPS and security
 
 0. Login to the server. USERNAME is your server username(the is default: root). IP_ADDRESS is your server IP address
 
@@ -73,7 +73,7 @@
    ssh USERNAME@IP_ADDRESS
    ```
 
-# Step 2: Install Packages, Kubernetes, SSH key
+# Step 2: Install Packages and kubernetes k3s cluster
 
 1. Update and install packages
 
@@ -117,7 +117,7 @@
 
    - Restart the server
 
-# Step 3: Create devops group, ci(for automation) group and data folder
+# Step 3: Create devops group(to have access to server data), ci group(for automation)
 
 1. Create devops group for server data access(the path /mnt/node/data/apps is called `NODE_APPS_DATA_PATH`). Add more users if needed (e.g. and for my personal usage: prosper as example)
 
