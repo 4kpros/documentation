@@ -14,7 +14,7 @@
    usermod -aG sudo prosper
    ```
 
-2. Configure firewall to block all incoming traffic except SSH (22), HTTP (80), and HTTPS (443). Exclure more as needed.
+2. Configure firewall to block all incoming traffic except SSH (22), HTTP (80), and HTTPS (443). Allow more ports as needed.
 
    ```
    sudo ufw default deny incoming
@@ -46,7 +46,7 @@
        ```
        ssh-keygen -R IP_ADDRESS
        ```
-     - Important: You'll need to remove the ssh passphrase for bot user otherwise it will fail in GitHub actions
+     - Important: You'll need to remove the ssh passphrase for bot user otherwise it will fail in CI/CD pipeline
 
      ```
      ssh-copy-id -i ~/.ssh/id_rsa.pub bot@IP_ADDRESS
@@ -61,13 +61,14 @@
    ```
 
    - Change these values(on /etc/ssh/sshd_config file) and save.
-      ```
-      PubkeyAuthentication yes
 
-      PasswordAuthentication no
+     ```
+     PubkeyAuthentication yes
 
-      PermitRootLogin no
-      ```
+     PasswordAuthentication no
+
+     PermitRootLogin no
+     ```
 
    - Restart SSH service
 
@@ -92,7 +93,17 @@
    sudo apt install curl wget bash git make tmux vim -y
    ```
 
-2. Generate ssh keys(for every user including root). You'll need to login with every user separately
+2. Generate SSH keys for each user (root, bot, etc...) on the server. You can use the same key for all users(not recommended), or generate separate keys per user. You'll need to login with every user separately. We recommend to generate ED25519 keys(more secure) but RSA keys are also fine if your server doesn't support ED25519.
+
+   - To generate ED25519 key
+
+   ```
+   ssh-keygen -t ed25519 -a 100
+   ```
+
+   or
+
+   - If you want to use ED25519 keys use below command
 
    ```
    ssh-keygen -t rsa -b 4096
