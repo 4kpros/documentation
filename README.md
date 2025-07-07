@@ -1,12 +1,12 @@
 # Step 1: Setup VPS and security
 
-0. Login to the server. USERNAME is your server username(the is default: root). IP_ADDRESS is your server IP address
+0. Login to your server. Replace `USERNAME` with your server username (default: root) and `IP_ADDRESS` with your server IP.
 
    ```
    ssh USERNAME@IP_ADDRESS
    ```
 
-1. Add new users (bot for CI and automations pipeline). Add more users if needed (e.g. for my personal usage: prosper)
+1. Add new users (e.g., `bot` for CI/CD automation. With `default` group). `prosper`: personal/admin user. So add personal/admin user to `sudo` group (add more as needed).
 
    ```
    adduser bot
@@ -14,7 +14,7 @@
    usermod -aG sudo prosper
    ```
 
-2. Add firewall rules: block all ports except 22(ssh), 80(http) and 443(https), and more if needed
+2. Configure firewall to block all incoming traffic except SSH (22), HTTP (80), and HTTPS (443). Exclure more as needed.
 
    ```
    sudo ufw default deny incoming
@@ -24,7 +24,7 @@
    sudo ufw allow 443
    ```
 
-   - Optional to show all rules
+   - Optional: to show all rules
      ```
      sudo ufw show Added
      ```
@@ -33,12 +33,12 @@
    sudo ufw enable
    ```
 
-   - Optional to show firewall status
+   - Optional: to show firewall status
      ```
      sudo ufw status
      ```
 
-3. Disable ssh login with password. Add more users if needed (e.g. for my personal usage: prosper)
+3. Disable ssh login with password. Add more users as needed(prosper is an example).
 
    - ------------- On personal computer(the one who will be used to login to the server via ssh) -------------
 
@@ -60,13 +60,22 @@
    sudo vim /etc/ssh/sshd_config
    ```
 
-   - Change these values(on /etc/ssh/sshd_config file): `PubkeyAuthentication yes` `PasswordAuthentication no` `PermitRootLogin no` and save
+   - Change these values(on /etc/ssh/sshd_config file) and save.
+      ```
+      `PubkeyAuthentication yes`
+
+      `PasswordAuthentication no`
+
+      `PermitRootLogin no`
+      ```
+
+   - Restart SSH service
 
    ```
    sudo systemctl restart ssh
    ```
 
-4. Logout and login again to check if changes are applied
+4. Logout and reconnect to confirm changes
 
    ```
    exit
@@ -100,26 +109,32 @@
      sudo systemctl enable k3s
      ```
 
-4. Create k3s group and add users to avoid using always sudo(for every user except root) and add permissions. Add more users if needed (e.g. for my personal usage: prosper)
+4. Create k3s group and add users to avoid using always sudo(for every user except root) and add permissions. Add more users as needed(prosper is an example).
 
    ```
    sudo groupadd k3s
    sudo usermod -aG k3s bot
    sudo usermod -aG k3s prosper
    sudo chown -R root:k3s /etc/rancher/k3s
-   sudo chmod -R 644 /etc/rancher/k3s
+   sudo chmod -R 640 /etc/rancher/k3s
    sudo chmod ug+x /etc/rancher/k3s
    ```
 
    ```
-   echo K3S_KUBECONFIG_MODE=\"644\" >> /etc/systemd/system/k3s.service.env
+   echo K3S_KUBECONFIG_MODE=\"640\" >> /etc/systemd/system/k3s.service.env
    ```
+
+   - Optional: check if k3s installation works as expected
+
+     ```
+     kubectl get nodes
+     ```
 
    - Restart the server
 
 # Step 3: Create devops group(to have access to server data), ci group(for automation)
 
-1. Create devops group for server data access(the path /mnt/node/data/apps is called `NODE_APPS_DATA_PATH`). Add more users if needed (e.g. and for my personal usage: prosper as example)
+1. Create devops group for server data access(the path /mnt/node/data/apps is called `NODE_APPS_DATA_PATH`). Add more users as needed(prosper is an example).
 
    ```
    sudo mkdir -p /mnt/node/data/apps
@@ -153,4 +168,4 @@
 
 2. By default k3s comes with traefik, and it's highly recommended to use it for ingress controller since it's already configured for you
 
-3. If you want to use Prometheus or Grafana, we recommend to install the helm chart. And also install it on your master node(it will overload the server and it's not recommended. It's better to install it on a separate cluster/node, or on different server or mabe on your local machine). Check the k3s documentation for more details
+3. If you want to use Prometheus or Grafana, we recommend to install the helm chart. And also do not install it on your master node(it will overload the server and it's not recommended. It's better to install it on a separate cluster/node, or on different server or maybe on your local machine). Check the k3s documentation for more details
