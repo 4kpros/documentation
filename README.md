@@ -73,7 +73,7 @@ ssh-copy-id prosper@IP_ADDRESS
 **On the server:**
 
 ```bash
-sudo vim /etc/ssh/sshd_config
+sudo nano /etc/ssh/sshd_config
 ```
 
 Edit these lines:
