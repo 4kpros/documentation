@@ -97,7 +97,6 @@ exit
 ssh prosper@IP_ADDRESS
 ```
 
----
 
 ## Step 2: Install Packages & Kubernetes (k3s)
 
@@ -159,8 +158,6 @@ Verify installation:
 kubectl get nodes
 ```
 
----
-
 ## Step 3: Server Data Access Groups
 
 ### 1. DevOps group for application data
@@ -185,21 +182,28 @@ sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
 sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
 ```
 
----
 
 ## Additionals
 
-- Get node/cluster name:
+
+### 1. Install Helm
 
 ```bash
-kubectl get nodes -o wide
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 ```
 
-Check the `NAME` column for your node name.
+### 3. Install cert manager to auto renew certificates with Let's Encrypt. Please use the lates version(the used one is `1.8.2` from July 2025
 
-- k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
+```bash
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
+```
 
-- For monitoring (Prometheus/Grafana), use Helm charts.
+To check if the installation is ok, please refer to the official page: https://cert-manager.io/docs/installation/kubectl/#2-optional-end-to-end-verify-the-installation
+
+
+### 3. k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
+
+### 4. For monitoring (Prometheus/Grafana), use Helm charts.
   Avoid installing heavy monitoring on the master node.
   Prefer separate clusters or nodes for observability.
 
