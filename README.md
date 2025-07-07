@@ -1,182 +1,191 @@
-# Step 1: Setup VPS and security
+# Server Setup - VPS Hardening & Kubernetes (k3s) Installation
 
-0. Login to your server. Replace `USERNAME` with your server username (default: root) and `IP_ADDRESS` with your server IP.
+## Step 1: Setup VPS and Security
 
-   ```
-   ssh USERNAME@IP_ADDRESS
-   ```
+### 0. Login to your server
 
-1. Add new users (e.g., `bot` for CI/CD automation. With `default` group). `prosper`: personal/admin user. So add personal/admin user to `sudo` group (add more as needed).
+Replace `USERNAME` with your username (default: `root`) and `IP_ADDRESS` with your server's public IP.
 
-   ```
-   adduser bot
-   adduser prosper
-   usermod -aG sudo prosper
-   ```
+```bash
+ssh USERNAME@IP_ADDRESS
+```
 
-2. Configure firewall to block all incoming traffic except SSH (22), HTTP (80), and HTTPS (443). Allow more ports as needed.
+### 1. Create users
 
-   ```
-   sudo ufw default deny incoming
-   sudo ufw default allow outgoing
-   sudo ufw allow OpenSSH
-   sudo ufw allow 80
-   sudo ufw allow 443
-   ```
+- `bot`: for CI/CD automation
+- `prosper`: personal/admin user
+- Add more as needed
 
-   - Optional: to show all rules
-     ```
-     sudo ufw show Added
-     ```
+```bash
+adduser bot
+adduser prosper
+usermod -aG sudo prosper
+```
 
-   ```
-   sudo ufw enable
-   ```
+### 2. Configure firewall
 
-   - Optional: to show firewall status
-     ```
-     sudo ufw status
-     ```
+Block all incoming traffic except SSH (22), HTTP (80), and HTTPS (443). Adapt as needed.
 
-3. Disable ssh login with password. Add more users as needed(prosper is an example).
+```bash
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow 22
+sudo ufw allow 80
+sudo ufw allow 443
+sudo ufw enable
+```
 
-   - ------------- On personal computer(the one who will be used to login to the server via ssh) -------------
+Optional: view rules
 
-     - Optional: to remove known host with same IP/hostname. IP_ADDRESS is your server IP address
-       ```
-       ssh-keygen -R IP_ADDRESS
-       ```
-     - Important: You'll need to remove the ssh passphrase for bot user otherwise it will fail in CI/CD pipeline
+```bash
+sudo ufw status
+```
 
-     ```
-     ssh-copy-id -i ~/.ssh/id_rsa.pub bot@IP_ADDRESS
-     ssh-copy-id -i ~/.ssh/id_rsa.pub prosper@IP_ADDRESS
-     ...add for other users except root
-     ```
+### 3. Disable SSH password authentication
 
-   - ------------- On the server -------------
+⚠️ Ensure your SSH keys are configured first!
 
-   ```
-   sudo vim /etc/ssh/sshd_config
-   ```
+**On your local machine:**
 
-   - Change these values(on /etc/ssh/sshd_config file) and save.
+```bash
+ssh-keygen -t ed25519 -a 100
+ssh-copy-id bot@IP_ADDRESS
+ssh-copy-id prosper@IP_ADDRESS
+```
 
-     ```
-     PubkeyAuthentication yes
+(Remove passphrase for `bot` if used in CI/CD)
 
-     PasswordAuthentication no
+**On the server:**
 
-     PermitRootLogin no
-     ```
+```bash
+sudo vim /etc/ssh/sshd_config
+```
 
-   - Restart SSH service
+Edit these lines:
 
-   ```
-   sudo systemctl restart ssh
-   ```
+```bash
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitRootLogin no
+```
 
-4. Logout and reconnect to confirm changes
+Restart SSH:
 
-   ```
-   exit
-   ssh USERNAME@IP_ADDRESS
-   ```
+```bash
+sudo systemctl restart ssh
+```
 
-# Step 2: Install Packages and kubernetes k3s cluster
+### 4. Reconnect to confirm
 
-1. Update and install packages
+```bash
+exit
+ssh prosper@IP_ADDRESS
+```
 
-   ```
-   sudo apt update
-   sudo apt upgrade
-   sudo apt install curl wget bash git make tmux vim -y
-   ```
+---
 
-2. Generate SSH keys for each user (root, bot, etc...) on the server. You can use the same key for all users(not recommended), or generate separate keys per user. You'll need to login with every user separately. We recommend to generate ED25519 keys(more secure) but RSA keys are also fine if your server doesn't support ED25519.
+## Step 2: Install Packages & Kubernetes (k3s)
 
-   - To generate ED25519 key
+### 1. Install essential packages
 
-   ```
-   ssh-keygen -t ed25519 -a 100
-   ```
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl wget bash git make tmux vim -y
+```
 
-   or
+### 2. Generate SSH keys for each user
 
-   - If you want to use ED25519 keys use below command
+Login with each user separately.
 
-   ```
-   ssh-keygen -t rsa -b 4096
-   ```
+Recommended: ED25519 (secure & modern)
 
-3. Install k3s
+```bash
+ssh-keygen -t ed25519 -a 100
+```
 
-   ```
-   curl -sfL https://get.k3s.io | sh -
-   ```
+### 3. Install k3s
 
-   - Optional(highly recommended): to start the service on boot
-     ```
-     sudo systemctl enable k3s
-     ```
+```bash
+curl -sfL https://get.k3s.io | sh -
+```
 
-4. Create k3s group and add users to avoid using always sudo(for every user except root) and add permissions. Add more users as needed(prosper is an example).
+Optional: enable at boot
 
-   ```
-   sudo groupadd k3s
-   sudo usermod -aG k3s bot
-   sudo usermod -aG k3s prosper
-   sudo chown -R root:k3s /etc/rancher/k3s
-   sudo chmod -R 640 /etc/rancher/k3s
-   sudo chmod ug+x /etc/rancher/k3s
-   ```
+```bash
+sudo systemctl enable k3s
+```
 
-   ```
-   echo K3S_KUBECONFIG_MODE=\"640\" >> /etc/systemd/system/k3s.service.env
-   ```
+### 4. k3s group configuration
 
-   - Optional: check if k3s installation works as expected
+```bash
+sudo groupadd k3s
+sudo usermod -aG k3s bot
+sudo usermod -aG k3s prosper
+sudo chown -R root:k3s /etc/rancher/k3s
+sudo chmod -R 640 /etc/rancher/k3s
+sudo chmod ug+x /etc/rancher/k3s
+```
 
-     ```
-     kubectl get nodes
-     ```
+Make Kubeconfig readable by group:
 
-   - Restart the server
+```bash
+echo 'K3S_KUBECONFIG_MODE="640"' | sudo tee -a /etc/systemd/system/k3s.service.env
+```
 
-# Step 3: Create devops group(to have access to server data), ci group(for automation)
+Verify installation:
 
-1. Create devops group for server data access(the path /mnt/node/data/apps is called `NODE_APPS_DATA_PATH`). Add more users as needed(prosper is an example).
+```bash
+kubectl get nodes
+```
 
-   ```
-   sudo mkdir -p /mnt/node/data/apps
-   sudo groupadd devops
-   sudo usermod -aG devops prosper
-   sudo chown -R root:devops /mnt/node/data/apps
-   sudo find /mnt/node/data/apps -type d -exec chmod 750 {} \;
-   sudo find /mnt/node/data/apps -type f -exec chmod 640 {} \;
-   ```
+---
 
-1. Create ci group for server data access(the path /mnt/node/data/ci is called `NODE_CI_DATA_PATH`).
+## Step 3: Server Data Access Groups
 
-   ```
-   sudo mkdir -p /mnt/node/data/ci
-   sudo groupadd ci
-   sudo usermod -aG ci bot
-   sudo chown -R root:ci /mnt/node/data/ci
-   sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
-   sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
-   ```
+### 1. DevOps group for application data
 
-# Additionals
+```bash
+sudo mkdir -p /mnt/node/data/apps
+sudo groupadd devops
+sudo usermod -aG devops prosper
+sudo chown -R root:devops /mnt/node/data/apps
+sudo find /mnt/node/data/apps -type d -exec chmod 750 {} \;
+sudo find /mnt/node/data/apps -type f -exec chmod 640 {} \;
+```
 
-1. Get the node/cluster name: login with user who have access to the server and have `k3s` group
+### 2. CI group for automation data
 
-   ```
-   kubectl get nodes -o wide
-   ```
+```bash
+sudo mkdir -p /mnt/node/data/ci
+sudo groupadd ci
+sudo usermod -aG ci bot
+sudo chown -R root:ci /mnt/node/data/ci
+sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
+sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
+```
 
-   Check the column `NAME` to get the node name
+---
 
-2. By default k3s comes with traefik, and it's highly recommended to use it for ingress controller since it's already configured for you
+## Additionals
 
-3. If you want to use Prometheus or Grafana, we recommend to install the helm chart. And also do not install it on your master node(it will overload the server and it's not recommended. It's better to install it on a separate cluster/node, or on different server or maybe on your local machine). Check the k3s documentation for more details
+- Get node/cluster name:
+
+```bash
+kubectl get nodes -o wide
+```
+
+Check the `NAME` column for your node name.
+
+- k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
+
+- For monitoring (Prometheus/Grafana), use Helm charts.
+  Avoid installing heavy monitoring on the master node.
+  Prefer separate clusters or nodes for observability.
+
+---
+
+## ✅ Server is now ready for Kubernetes and secure operations.
+
+---
+
+_End of setup guide._
