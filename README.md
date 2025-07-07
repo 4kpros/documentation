@@ -6,7 +6,7 @@
    ssh USERNAME@IP_ADDRESS
    ```
 
-1. Add new users (bot for CI and automations pipeline). Add more users if needed (e.g. and for my personal usage: prosper)
+1. Add new users (bot for CI and automations pipeline). Add more users if needed (e.g. for my personal usage: prosper)
 
    ```
    adduser bot
@@ -38,7 +38,7 @@
      sudo ufw status
      ```
 
-3. Disable ssh login with password. Add more users if needed (e.g. and for my personal usage: prosper as example)
+3. Disable ssh login with password. Add more users if needed (e.g. for my personal usage: prosper)
 
    - ------------- On personal computer(the one who will be used to login to the server via ssh) -------------
 
@@ -100,7 +100,7 @@
      sudo systemctl enable k3s
      ```
 
-4. Create k3s group and add users to avoid using always sudo(for every user except root) and add permissions. Add more users if needed (e.g. and for my personal usage: prosper as example)
+4. Create k3s group and add users to avoid using always sudo(for every user except root) and add permissions. Add more users if needed (e.g. for my personal usage: prosper)
 
    ```
    sudo groupadd k3s
