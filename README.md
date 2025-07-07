@@ -185,14 +185,7 @@ sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
 
 ## Additionals
 
-
-### 1. Install Helm
-
-```bash
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-```
-
-### 3. Install cert manager to auto renew certificates with Let's Encrypt. Please use the lates version(the used one is `1.8.2` from July 2025
+### 1. Install cert manager to auto renew certificates with Let's Encrypt. Please use the latest version(the used one is `1.8.2` from July 2025
 
 ```bash
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.18.2/cert-manager.yaml
@@ -203,12 +196,16 @@ To check if the installation is ok, please refer to the official page: https://c
 
 ### 3. k3s uses **Traefik** as the default Ingress Controller. Recommended to keep it for simplicity.
 
+
 ### 4. For monitoring (Prometheus/Grafana), use Helm charts.
   Avoid installing heavy monitoring on the master node.
   Prefer separate clusters or nodes for observability.
 
----
+- Optional: to install Helm
+  
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
 
 ## ✅ Server is now ready for Kubernetes and secure operations.
 
----
