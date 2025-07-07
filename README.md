@@ -6,12 +6,11 @@
    ssh USERNAME@IP_ADDRESS
    ```
 
-1. Add new users (GitHub for GitHub actions). Add more users if needed (e.g. and for my personal usage: prosper as example)
+1. Add new users (bot for CI and automations pipeline). Add more users if needed (e.g. and for my personal usage: prosper)
 
    ```
-   adduser github
+   adduser bot
    adduser prosper
-   usermod -aG sudo github
    usermod -aG sudo prosper
    ```
 
@@ -47,10 +46,10 @@
        ```
        ssh-keygen -R IP_ADDRESS
        ```
-     - Important: You'll need to remove the ssh passphrase for github user otherwise it will fail in GitHub actions
+     - Important: You'll need to remove the ssh passphrase for bot user otherwise it will fail in GitHub actions
 
      ```
-     ssh-copy-id -i ~/.ssh/id_rsa.pub github@IP_ADDRESS
+     ssh-copy-id -i ~/.ssh/id_rsa.pub bot@IP_ADDRESS
      ssh-copy-id -i ~/.ssh/id_rsa.pub prosper@IP_ADDRESS
      ...add for other users except root
      ```
@@ -105,7 +104,7 @@
 
    ```
    sudo groupadd k3s
-   sudo usermod -aG k3s github
+   sudo usermod -aG k3s bot
    sudo usermod -aG k3s prosper
    sudo chown -R root:k3s /etc/rancher/k3s
    sudo chmod -R 644 /etc/rancher/k3s
@@ -137,7 +136,7 @@
    ```
    sudo mkdir -p /mnt/node/data/ci
    sudo groupadd ci
-   sudo usermod -aG ci github
+   sudo usermod -aG ci bot
    sudo chown -R root:ci /mnt/node/data/ci
    sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
    sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
