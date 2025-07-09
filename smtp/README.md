@@ -152,7 +152,19 @@ On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with yo
 
 On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with your domain name and `DKIM_PUBLIC_KEY` with your DKIM public key stored at `/etc/opendkim/keys/DOMAIN_NAME/default.txt`):
 
-The public key is stored at `/etc/opendkim/keys/DOMAIN_NAME/default.txt`. You shoul only copy the vabue of `p="..."` without the leading `p="` and the trailing `"`.
+The public key is stored at `/etc/opendkim/keys/DOMAIN_NAME/default.txt`. You shoul only copy the vabue between parentheses `( "..." ) `without thethe trailing `"`. E.g.
+
+```bash
+default._domainkey      IN      TXT     ( "v=DKIM1; h=sha256; k=rsa; "
+"p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl9apPLhHMBS3rlFAzexryLgpQeeEsiimElndVmrI1Ti6osm7+lYlXQHF3buSqFfzXu3WxdtzZk3EmQUOe2qiw0fPQnwOvN+lJLUZXv6kh1bxG5/9A18nApRM6enJUi4Q5qJCzI+HeuKoHTMuaWuGxRN17Lh7un2XeKxqPVL+Y9rp+gysloK0uW22yRGby9/3oMD7Xo8f/7dCvR"
+"7fkfn6jhn7WypdEUptqptoXtugHjJm7/CY4QQ/141Zy5ea1i6g3Bb4t0RA/m3hdNlezADLL0pqhhMuYivE2Eok8wuFaM52sEJCYaIKa9rcVMm//AR1TSPWAkpoxPwmNRSjuRZ5dQIDAQAB" )  ; ----- DKIM key default for emfi.cm
+```
+
+Copy only the value between the parentheses. All in one line. You will need to concat the lines(`p= with the next line`).
+
+```bash
+v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl9apPLhHMBS3rlFAzexryLgpQeeEsiimElndVmrI1Ti6osm7+lYlXQHF3buSqFfzXu3WxdtzZk3EmQUOe2qiw0fPQnwOvN+lJLUZXv6kh1bxG5/9A18nApRM6enJUi4Q5qJCzI+HeuKoHTMuaWuGxRN17Lh7un2XeKxqPVL+Y9rp+gysloK0uW22yRGby9/3oMD7Xo8f/7dCvR7fkfn6jhn7WypdEUptqptoXtugHjJm7/CY4QQ/141Zy5ea1i6g3Bb4t0RA/m3hdNlezADLL0pqhhMuYivE2Eok8wuFaM52sEJCYaIKa9rcVMm//AR1TSPWAkpoxPwmNRSjuRZ5dQIDAQAB
+```
 
 - **Hostname**: `default._domainkey.DOMAIN_NAME`
 - **Type**: TXT
