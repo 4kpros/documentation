@@ -2,6 +2,14 @@
 
 #### 1.1. On your Server
 
+##### 1.1.0. Login to your server
+
+Replace `USERNAME` with your username (default: `root`) and `IP_ADDRESS` with your server's public IP address.
+
+```bash
+ssh USERNAME@IP_ADDRESS
+```
+
 ##### 1.1.1. Install Postfix and mailutils
 
 - Install `postfix`:
