@@ -50,7 +50,7 @@ sudo ufw status
 
 Generate SSH key (choose one):
 
-(Ignore passphrase for `bot` if used in CI/CD)
+(Ignore passphrase for user `bot` if used in CI/CD automation)
 
 - Recommended: ED25519 (secure & modern)
 
@@ -64,7 +64,7 @@ ssh-keygen -t ed25519 -a 100
 ssh-keygen -t rsa -b 4096
 ```
 
-Then copy the public key to your server:
+Then copy the public key to your server(all users except `root`):
 
 ```bash
 ssh-copy-id bot@IP_ADDRESS
@@ -174,12 +174,12 @@ sudo find /mnt/node/data/apps -type f -exec chmod 640 {} \;
 ### 2. CI group for automation data
 
 ```bash
-sudo mkdir -p /mnt/node/data/ci
-sudo groupadd ci
-sudo usermod -aG ci bot
-sudo chown -R root:ci /mnt/node/data/ci
-sudo find /mnt/node/data/ci -type d -exec chmod 770 {} \;
-sudo find /mnt/node/data/ci -type f -exec chmod 660 {} \;
+sudo mkdir -p /mnt/node/data/automation
+sudo groupadd automation
+sudo usermod -aG automation bot
+sudo chown -R root:automation /mnt/node/data/automation
+sudo find /mnt/node/data/automation -type d -exec chmod 770 {} \;
+sudo find /mnt/node/data/automation -type f -exec chmod 660 {} \;
 ```
 
 ## Additionals
