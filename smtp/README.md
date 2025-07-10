@@ -10,25 +10,27 @@ Replace `USERNAME` with your username (default: `root`) and `IP_ADDRESS` with yo
 ssh USERNAME@IP_ADDRESS
 ```
 
-##### 1.1.1. Install Postfix and mailutils
+##### 1.1.1. Install Postfix
 
 - Install `postfix`:
 
 ```bash
 sudo apt update
-sudo apt install postfix mailutils -y
+sudo apt install postfix -y
 ```
 
 - Choose `Internet with smarthost` (use a relay). This documentation does not cover other options.
 
 - Set the mail name as your domain name for the root user (E.g. If you have 3 domain names: `example.com`, `example.net` and `example.org`, you need to choose one of them as the mail name. It will be used for the root user. If you have only one domain name, set the mail name to that domain name)
 
-- Set the smarthost to `[SMTP_RELAY]:587` (The square brackets disable MX record lookups — this is recommended)
+- Set the smarthost to `[SMTP_RELAY]` (The square brackets disable MX record lookups — this is recommended)
 
-- Check `/etc/postfix/main.cf` by adding or modifying the following line:
+- Set the following options in `/etc/postfix/main.cf` at the end of the file (Skip if you don't need tls and authentication):
+
+Ensure that there are no duplicate lines(you can comment out the lines you don't need):
 
 ```bash
-relayhost = [SMTP_RELAY]:587
+relayhost = [relay.hostup.se]
 ```
 
 - Restart Postfix:
@@ -147,7 +149,16 @@ To ensure that only your server can send emails through Hostup's relay, add this
 - **Type**: TXT
 - **Value**: `v=mc1 auth=IP_ADDRESS`
 
-##### 1.2.3. DMARC(anti-spoofing)
+##### 1.2.". MX
+
+On your DNS provider, add the following MX record:
+
+- **Hostname**: `@` or leave blank (depending on the provider)
+- **Type**: MX
+- **Value**: `mail.DOMAIN_NAME` or `DOMAIN_NAME` (in case of `mail.DOMAIN_NAME` add new `A` record for `mail.DOMAIN_NAME` point to your server IP address)
+- **Priority**: `10` (the default is `10`)
+
+##### 1.2.4. DMARC(anti-spoofing)
 
 On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with your domain name and `RECIPIENT_EMAIL_ADDRESS` with the email address to receive DMARC reports):
 
@@ -155,7 +166,7 @@ On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with yo
 - **Type**: TXT
 - **Value**: `v=DMARC1; p=none; rua=mailto:RECIPIENT_EMAIL_ADDRESS`
 
-##### 1.2.4. DKIM(signature)
+##### 1.2.5. DKIM(signature)
 
 On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with your domain name, `SELECTOR_NAME_YEAR` with the second-level domain name and current year, and `DKIM_PUBLIC_KEY` with your DKIM public key stored at `/etc/opendkim/keys/DOMAIN_NAME/SELECTOR_NAME_YEAR.txt`):
 
@@ -195,9 +206,17 @@ Go to this page: [https://mxtoolbox.com/SuperTool.aspx?action=spf](https://mxtoo
 
 ##### 1.2.6. Send a test email(replace `RECIPIENT_EMAIL_ADDRESS` with the email address to receive the email):
 
+- Install `mailutils`:
+
 ```bash
-echo "Hi there! This is a test email" | mail -s "Subject of the email" RECIPIENT_EMAIL_ADDRESS
+sudo apt install mailutils -y
 ```
+
+```bash
+echo "Hi there! This is a test email" | mail -s "Welcome" -r "SENDER_USERNAME <SENDER_EMAIL_ADDRESS>" RECIPIENT_EMAIL_ADDRESS
+```
+
+E.g. `echo "Hi there! This is a test email" | mail -s "Welcome" -r "No Reply <no-reply@example.com>" receiver@example.com`
 
 If you don’t receive the email:
 
