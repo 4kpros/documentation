@@ -1,0 +1,2 @@
+RELAY_SMARTHOST="[relay.example.com]:25"
+DOMAIN_NAME="example.com"
