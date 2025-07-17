@@ -102,7 +102,7 @@ Value: v=DMARC1; p=none; rua=mailto:$DMARC_REPORT_EMAIL
 
 📌 MX Record:
 Name: @
-Value: $DOMAIN_NAME
+Value: mail.$DOMAIN_NAME
 Priority: 10
 
 EOF
