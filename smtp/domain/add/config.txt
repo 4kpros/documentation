@@ -1,3 +1,4 @@
 DOMAIN_NAME="example.com"
 SELECTOR="example2025"
 DMARC_REPORT_EMAIL="dmarc-noreply@example.com"
+SERVER_IP="0.0.0.0"

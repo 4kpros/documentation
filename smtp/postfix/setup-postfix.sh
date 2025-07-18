@@ -55,12 +55,6 @@ echo ""
 echo "Installing packages..."
 apt update
 apt install -y postfix mailutils opendkim opendkim-tools
-# Install required packages
-echo ""
-echo "Installing packages..."
-export DEBIAN_FRONTEND=noninteractive
-apt update
-DEBIAN_FRONTEND=noninteractive apt install -y postfix mailutils opendkim opendkim-tools
 
 # Configure Postfix
 echo ""
@@ -68,13 +62,6 @@ echo "Configuring Postfix..."
 postconf -e "relayhost = $RELAY_SMARTHOST"
 postconf -e "myhostname = $DOMAIN_NAME"
 postconf -e "mydestination = \$myhostname, localhost"
-postconf -e "myorigin = $DOMAIN_NAME"
-
-# Configure OpenDKIM integration with Postfix
-postconf -e "milter_protocol = 2"
-postconf -e "milter_default_action = accept"
-postconf -e "smtpd_milters = unix:/var/spool/postfix/opendkim/opendkim.sock"
-postconf -e "non_smtpd_milters = unix:/var/spool/postfix/opendkim/opendkim.sock"
 
 # Restart Postfix
 echo "Restarting Postfix..."
@@ -89,35 +76,23 @@ echo "Postfix is running."
 echo ""
 echo "Configuring OpenDKIM..."
 # Backup original config if exists
-if [ -f /etc/opendkim.conf ]; then
+if [ -f /etc/opendkim.conf ] && [ ! -f /etc/opendkim.conf.backup ]; then
     cp /etc/opendkim.conf /etc/opendkim.conf.backup
 fi
-# Create OpenDKIM configuration
-cat <<EOF > /etc/opendkim.conf
+# Load default OpenDKIM configuration
+cp -f /etc/opendkim.conf.backup /etc/opendkim.conf
+# Update OpenDKIM configuration
+cat <<EOF >> /etc/opendkim.conf
 # Basic OpenDKIM configuration
 Mode                  sv
-AutoRestart           Yes
-AutoRestartRate       10/1h
-Syslog                yes
-LogWhy                yes
-Canonicalization      relaxed/simple
 ExternalIgnoreList    refile:/etc/opendkim/trustedhosts
 InternalHosts         refile:/etc/opendkim/trustedhosts
 SigningTable          refile:/etc/opendkim/signing.table
 KeyTable              refile:/etc/opendkim/key.table
-
-# Socket configuration for Postfix
-Socket                unix:/var/spool/postfix/opendkim/opendkim.sock
-PidFile               /var/run/opendkim/opendkim.pid
-UMask                 022
-UserID                opendkim:opendkim
-TemporaryDirectory    /var/tmp
 EOF
 
 # Create DKIM directories
-mkdir -p /etc/opendkim/keys
-mkdir -p /var/spool/postfix/opendkim
-chown opendkim:opendkim /var/spool/postfix/opendkim
+mkdir -p /etc/opendkim
 
 # Create DKIM configuration files
 touch /etc/opendkim/signing.table
@@ -132,27 +107,42 @@ localhost
 $DOMAIN_NAME
 EOF
 
-# Set proper permissions
-chown -R opendkim:opendkim /etc/opendkim
-chmod 750 /etc/opendkim
-chmod 640 /etc/opendkim/signing.table /etc/opendkim/key.table /etc/opendkim/trustedhosts
-
-# Add postfix user to opendkim group
-usermod -aG opendkim postfix
-
-# Enable and start services
-systemctl enable postfix
-systemctl enable opendkim
-
-# Restart services
-echo ""
-echo "Restarting services..."
+# Restart OpenDKIM
+echo "Restarting OpenDKIM..."
 systemctl restart opendkim
 if ! systemctl is-active --quiet opendkim; then
     echo "❌ Error: OpenDKIM failed to start"
     systemctl status opendkim
     exit 1
 fi
+echo "OpenDKIM is running."
+
+# Set proper permissions
+echo ""
+echo "Setting permissions..."
+chown -R opendkim:opendkim /etc/opendkim
+chmod 750 /etc/opendkim
+chmod 640 /etc/opendkim/signing.table /etc/opendkim/key.table /etc/opendkim/trustedhosts
+# Add postfix user to opendkim group
+usermod -aG opendkim postfix
+
+# Enable and start services
+echo ""
+echo "Enabling services..."
+systemctl enable postfix
+systemctl enable opendkim
+
+# Restart services
+echo ""
+echo "Restarting services..."
+echo "🔄 Restarting Postfix..."
+systemctl restart opendkim
+if ! systemctl is-active --quiet opendkim; then
+    echo "❌ Error: OpenDKIM failed to start"
+    systemctl status opendkim
+    exit 1
+fi
+echo "🔄 Restarting Postfix..."
 systemctl restart postfix
 if ! systemctl is-active --quiet postfix; then
     echo "❌ Error: Postfix failed to start"

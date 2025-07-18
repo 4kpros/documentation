@@ -35,6 +35,10 @@ if [ -z "$DMARC_REPORT_EMAIL" ]; then
     echo "❌ Error: DMARC_REPORT_EMAIL is missing in config file"
     exit 1
 fi
+if [ -z "$SERVER_IP" ]; then
+    echo "❌ Error: SERVER_IP is missing in config file"
+    exit 1
+fi
 
 # Remove any trailing carriage returns
 DOMAIN_NAME=$(echo "$DOMAIN_NAME" | tr -d '\r')
@@ -94,7 +98,7 @@ Value: $(awk '/^[^-]/ {gsub(/["\t\r ]/, ""); printf "%s", $0}' "$KEY_DIR/$SELECT
 
 📌 SPF TXT Record:
 Name: @
-Value: v=spf1 a mx ~all
+Value: v=spf1 a mx include:relay.mailchannels.net ~all
 
 📌 DMARC TXT Record:
 Name: _dmarc
@@ -103,6 +107,11 @@ Value: v=DMARC1; p=none; rua=mailto:$DMARC_REPORT_EMAIL
 📌 MX Record:
 Name: @
 Value: mail.$DOMAIN_NAME
+Priority: 10
+
+📌 TXT Record (E.g. hostup):
+Name: _hostup
+Value: "v=mc1 auth=$SERVER_IP"
 Priority: 10
 
 EOF

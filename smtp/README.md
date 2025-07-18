@@ -84,7 +84,7 @@ sudo mkdir -p /etc/opendkim/keys/DOMAIN_NAME
 cd /etc/opendkim/keys/DOMAIN_NAME
 ```
 
-- Generates keypair with the selector `SELECTOR_NAME_YEAR` (replace `DOMAIN_NAME` with your domain name and `SELECTOR_NAME_YEAR` with the second-level domain name and current year):
+- Generates keypair with the selector `SELECTOR` (replace `DOMAIN_NAME` with your domain name and `SELECTOR` with the second-level domain name and current year):
 
 For better security, renew the keypair every year. For that you need to have a unique selector for each year(you can use a unique selector name but it's difficult to debug).
 
@@ -93,26 +93,26 @@ E.g. If your domain name is `example.com` and the current year is `2025`, the se
 You can reduce the length of the selector it is too long. Eg. `se2025` instead of `superexample2025` for the domain name `superexample.com`.
 
 ```bash
-sudo opendkim-genkey -s SELECTOR_NAME_YEAR -d DOMAIN_NAME
+sudo opendkim-genkey -s SELECTOR -d DOMAIN_NAME
 ```
 
 - Add right access permissions:
 
 ```bash
-sudo chown opendkim:opendkim SELECTOR_NAME_YEAR.private
-sudo chmod 600 SELECTOR_NAME_YEAR.private
+sudo chown opendkim:opendkim SELECTOR.private
+sudo chmod 600 SELECTOR.private
 ```
 
-- Add the following content to the end of `/etc/opendkim/key.table` (replace `DOMAIN_NAME` with your domain name and `SELECTOR_NAME_YEAR` with the second-level domain name and current year):
+- Add the following content to the end of `/etc/opendkim/key.table` (replace `DOMAIN_NAME` with your domain name and `SELECTOR` with the second-level domain name and current year):
 
 ```bash
-SELECTOR_NAME_YEAR._domainkey.DOMAIN_NAME DOMAIN_NAME:SELECTOR_NAME_YEAR:/etc/opendkim/keys/DOMAIN_NAME/SELECTOR_NAME_YEAR.private
+SELECTOR._domainkey.DOMAIN_NAME DOMAIN_NAME:SELECTOR:/etc/opendkim/keys/DOMAIN_NAME/SELECTOR.private
 ```
 
-- Add the following content to the end of `/etc/opendkim/signing.table` (replace `DOMAIN_NAME` with your domain name and `SELECTOR_NAME_YEAR` with the second-level domain name and current year):
+- Add the following content to the end of `/etc/opendkim/signing.table` (replace `DOMAIN_NAME` with your domain name and `SELECTOR` with the second-level domain name and current year):
 
 ```bash
-*@DOMAIN_NAME SELECTOR_NAME_YEAR._domainkey.DOMAIN_NAME
+*@DOMAIN_NAME SELECTOR._domainkey.DOMAIN_NAME
 ```
 
 - Add the following content to the end of `/etc/opendkim/trustedhosts` (replace `DOMAIN_NAME` with your domain name):
@@ -168,9 +168,9 @@ On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with yo
 
 ##### 1.2.5. DKIM(signature)
 
-On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with your domain name, `SELECTOR_NAME_YEAR` with the second-level domain name and current year, and `DKIM_PUBLIC_KEY` with your DKIM public key stored at `/etc/opendkim/keys/DOMAIN_NAME/SELECTOR_NAME_YEAR.txt`):
+On your DNS provider, add the following TXT record(replace `DOMAIN_NAME` with your domain name, `SELECTOR` with the second-level domain name and current year, and `DKIM_PUBLIC_KEY` with your DKIM public key stored at `/etc/opendkim/keys/DOMAIN_NAME/SELECTOR.txt`):
 
-The public key is stored at `/etc/opendkim/keys/DOMAIN_NAME/SELECTOR_NAME_YEAR.txt`. You shoul only copy the vabue between parentheses `( "..." ) `without thethe trailing `"`.
+The public key is stored at `/etc/opendkim/keys/DOMAIN_NAME/SELECTOR.txt`. You shoul only copy the vabue between parentheses `( "..." ) `without thethe trailing `"`.
 
 E.g.
 
@@ -188,7 +188,7 @@ E.g.
 v=DKIM1; h=sha256; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAl9apPLhHMBS3rlFAzexryLgpQeeEsiimElndVmrI1Ti6osm7+lYlXQHF3buSqFfzXu3WxdtzZk3EmQUOe2qiw0fPQnwOvN+lJLUZXv6kh1bxG5/9A18nApRM6enJUi4Q5qJCzI+HeuKoHTMuaWuGxRN17Lh7un2XeKxqPVL+Y9rp+gysloK0uW22yRGby9/3oMD7Xo8f/7dCvR7fkfn6jhn7WypdEUptqptoXtugHjJm7/CY4QQ/141Zy5ea1i6g3Bb4t0RA/m3hdNlezADLL0pqhhMuYivE2Eok8wuFaM52sEJCYaIKa9rcVMm//AR1TSPWAkpoxPwmNRSjuRZ5dQIDAQAB
 ```
 
-- **Hostname**: `SELECTOR_NAME_YEAR._domainkey.DOMAIN_NAME`
+- **Hostname**: `SELECTOR._domainkey.DOMAIN_NAME`
 - **Type**: TXT
 - **Value**: `DKIM_PUBLIC_KEY`
 
@@ -202,7 +202,7 @@ Go to this page: [https://mxtoolbox.com/SuperTool.aspx?action=spf](https://mxtoo
 
 - Choose `DMARC Lookup` and enter `DOMAIN_NAME`. Checks the results.
 
-- Choose `DKIM Lookup` and enter `DOMAIN_NAME:SELECTOR_NAME_YEAR`. Checks the results.
+- Choose `DKIM Lookup` and enter `DOMAIN_NAME:SELECTOR`. Checks the results.
 
 ##### 1.2.6. Send a test email(replace `RECIPIENT_EMAIL_ADDRESS` with the email address to receive the email):
 
