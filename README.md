@@ -96,7 +96,7 @@ sudo systemctl restart ssh
 
 ```bash
 exit
-ssh prosper@IP_ADDRESS
+ssh USERNAME@IP_ADDRESS
 ```
 
 ## Step 2: Install Packages & Kubernetes (k3s)
