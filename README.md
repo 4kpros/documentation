@@ -24,7 +24,7 @@ usermod -aG sudo prosper
 
 ### 2. Configure firewall
 
-Block all incoming traffic except SSH (22), HTTP (80), HTTPS (443), and SMTP (587). Adapt as needed.
+Block all incoming traffic except SSH (22), HTTP (80), HTTPS (443), and SMTP (25, 587). Adapt as needed.
 
 ```bash
 sudo ufw default deny incoming
@@ -33,6 +33,7 @@ sudo ufw allow 22
 sudo ufw allow 80
 sudo ufw allow 443
 sudo ufw allow 587
+sudo ufw allow 25
 sudo ufw enable
 ```
 
