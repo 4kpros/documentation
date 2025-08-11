@@ -99,6 +99,18 @@ exit
 ssh USERNAME@IP_ADDRESS
 ```
 
+### 5. If you want the bot user can launch sudo command without password. Add the following line at the end of the file:
+
+```bash
+sudo visudo
+```
+
+Add this line at the end of the file and save. Replace `bot` by your username
+
+```bash
+bot  ALL=(ALL) NOPASSWD: ALL
+```
+
 ## Step 2: Install Packages & Kubernetes (k3s)
 
 ### 1. Install essential packages
