@@ -96,20 +96,17 @@ cat > output.txt <<EOF
 Name: $SELECTOR._domainkey.$DOMAIN_NAME
 Value: $(awk '/^[^-]/ {gsub(/["\t\r ]/, ""); printf "%s", $0}' "$KEY_DIR/$SELECTOR.txt")
 
-📌 SPF TXT Record:
+📌 DMARC TXT Record:
+Name: _dmarc
+Value: v=DMARC1; p=none; rua=mailto:$DMARC_REPORT_EMAIL; ruf=mailto:$DMARC_REPORT_EMAIL
+
+📌 * Optional(Depending of your cloud provider)
+SPF TXT Record (E.g. hostup):
 Name: @
 Value: v=spf1 a mx include:relay.mailchannels.net ~all
 
-📌 DMARC TXT Record:
-Name: _dmarc
-Value: v=DMARC1; p=none; rua=mailto:$DMARC_REPORT_EMAIL
-
-📌 MX Record:
-Name: @
-Value: mail.$DOMAIN_NAME
-Priority: 10
-
-📌 TXT Record (E.g. hostup):
+📌 * Optional(Depending of your cloud provider)
+TXT Record (E.g. hostup):
 Name: _hostup
 Value: "v=mc1 auth=$SERVER_IP"
 Priority: 10
