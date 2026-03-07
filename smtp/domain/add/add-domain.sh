@@ -108,7 +108,7 @@ Value: v=spf1 a mx include:relay.mailchannels.net ~all
 📌 * Optional(Depending of your cloud provider)
 TXT Record (E.g. hostup):
 Name: _hostup
-Value: "v=mc1 auth=$SERVER_IP"
+Value: v=mc1 auth=$SERVER_IP
 Priority: 10
 
 EOF
