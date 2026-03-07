@@ -103,7 +103,7 @@ Value: v=DMARC1; p=none; rua=mailto:$DMARC_REPORT_EMAIL; ruf=mailto:$DMARC_REPOR
 📌 * Optional(Depending of your cloud provider)
 SPF TXT Record (E.g. hostup):
 Name: @
-Value: v=spf1 a mx include:relay.mailchannels.net ~all
+Value: v=spf1 a mx include:spf.hostup.se include:relay.mailchannels.net ~all
 
 📌 * Optional(Depending of your cloud provider)
 TXT Record (E.g. hostup):
