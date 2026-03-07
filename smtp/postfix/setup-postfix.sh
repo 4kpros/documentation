@@ -56,6 +56,15 @@ echo "Installing packages..."
 apt update
 apt install -y postfix mailutils opendkim opendkim-tools
 
+# Generate main.cf if it doesn't exist
+if [ ! -f /etc/postfix/main.cf ]; then
+    if [ -f /etc/postfix/main.cf.proto ]; then
+        cp /etc/postfix/main.cf.proto /etc/postfix/main.cf
+    else
+        postfix post-install create-missing
+    fi
+fi
+
 # Configure Postfix
 echo ""
 echo "Configuring Postfix..."
