@@ -2,12 +2,27 @@
 
 ## Step 1: Setup server and Security
 
-### 0. Login to your server
+### 0. Login to your server and install packages
 
 Replace `USERNAME` with your username (default: `root`) and `IP_ADDRESS` with your server's public IP address.
 
 ```bash
 ssh USERNAME@IP_ADDRESS
+```
+
+```
+apt update && apt upgrade -y && apt install -y \
+  git \
+  curl \
+  wget \
+  tmux \
+  vim \
+  htop \
+  unzip \
+  ufw \
+  fail2ban \
+  net-tools \
+  build-essential
 ```
 
 ### 1. Create users
